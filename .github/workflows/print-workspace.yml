@@ -1,0 +1,14 @@
+name: Print GitHub Workspace
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  print_workspace:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print GitHub Workspace
+        run: echo "GitHub Workspace: ${{ github.workspace }}"
