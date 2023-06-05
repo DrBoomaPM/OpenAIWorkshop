@@ -9,6 +9,23 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      # This is the path of your Azure Function in Git.  
+      GIT_FunctionApp_Name:
+        description: 'Provide the Function App Name'
+        required: true
+        default: 'samplefuncapp1122'
+        
+      GIT_FunctionApp_URL:
+        description: 'Provide the Function App URL'
+        required: true
+        default: 'https://samplefuncapp1122.azurewebsites.net'
+        
+       # This is the path of your Function app in Git.
+      GIT_FunctionApp_PATH:
+        description: 'Relative path for Function'
+        required: true
+        default: '/scenarios/natural_language_query/azurefunc/'
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
