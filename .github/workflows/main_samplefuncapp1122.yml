@@ -8,6 +8,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'scenarios/natural_language_query/azurefunc/**'
   workflow_dispatch:
     inputs:
       # This is the path of your Azure Function in Git.  
@@ -29,7 +31,7 @@ on:
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: 'azurefunc' # set this to the path to your web app project, defaults to the repository root
-  PYTHON_VERSION: '3.8' # set this to the python version to use (supports 3.6, 3.7, 3.8)
+  PYTHON_VERSION: '3.11.3' # set this to the python version to use (supports 3.6, 3.7, 3.8)
 
 jobs:
   build:
@@ -84,7 +86,7 @@ jobs:
         with:
           app-name: 'samplefuncapp1122'
           slot-name: 'Production'
-          package: './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           scm-do-build-during-deployment: true
           enable-oryx-build: true
