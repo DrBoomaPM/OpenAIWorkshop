@@ -87,7 +87,7 @@ jobs:
         with:
           app-name: ${{ github.event.inputs.GIT_FunctionApp_Name }} #'samplefuncapp1122'
           slot-name: 'Production'
-          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+          package: ${{ github.workspace }}/${{ github.event.inputs.GIT_FunctionApp_PATH }} #'${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           scm-do-build-during-deployment: true
           enable-oryx-build: true
