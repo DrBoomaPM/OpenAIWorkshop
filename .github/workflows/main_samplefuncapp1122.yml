@@ -28,7 +28,7 @@ on:
         default: '/scenarios/natural_language_query/azurefunc/'
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '${{ github.workspace }}/${{ github.event.inputs.GIT_natural_language_query_PATH }}' # set this to the path to your web app project, defaults to the repository root
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'azurefunc' # set this to the path to your web app project, defaults to the repository root
   PYTHON_VERSION: '3.8' # set this to the python version to use (supports 3.6, 3.7, 3.8)
 
 jobs:
@@ -49,8 +49,11 @@ jobs:
           source venv/bin/activate
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
-        
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+          popd
+                
       # Optional: Add step to run tests here
 
       - name: Upload artifact for deployment job
@@ -58,7 +61,7 @@ jobs:
         with:
           name: python-app
           path: |
-            . 
+            './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}' 
             !venv/
 
   deploy:
@@ -73,7 +76,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: python-app
-          path: .
+          path: './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
 
       - name: 'Deploy to Azure Functions'
         uses: Azure/functions-action@v1
@@ -81,7 +84,7 @@ jobs:
         with:
           app-name: 'samplefuncapp1122'
           slot-name: 'Production'
-          package: ${{ github.workspace }}/${{ github.event.inputs.GIT_natural_language_query_PATH }}
+          package: './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           scm-do-build-during-deployment: true
           enable-oryx-build: true
