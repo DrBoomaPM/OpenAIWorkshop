@@ -89,5 +89,5 @@ jobs:
           slot-name: 'Production'
           package: ${{ github.workspace }}/${{ github.event.inputs.GIT_FunctionApp_PATH }} #'${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          scm-do-build-during-deployment: true
-          enable-oryx-build: true
+          scm-do-build-during-deployment: false #true
+          enable-oryx-build: false #true
