@@ -8,30 +8,11 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'scenarios/natural_language_query/azurefunc/**'
   workflow_dispatch:
-    inputs:
-      # This is the path of your Azure Function in Git.  
-      GIT_FunctionApp_Name:
-        description: 'Provide the Function App Name'
-        required: true
-        default: 'samplefuncapp1122'
-        
-      GIT_FunctionApp_URL:
-        description: 'Provide the Function App URL'
-        required: true
-        default: 'https://samplefuncapp1122.azurewebsites.net'
-        
-       # This is the path of your Function app in Git.
-      GIT_FunctionApp_PATH:
-        description: 'Relative path for Function'
-        required: true
-        default: '/scenarios/natural_language_query/azurefunc/'
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: ${{ github.workspace }}/${{ github.event.inputs.GIT_FunctionApp_PATH }} #'azurefunc' # set this to the path to your web app project, defaults to the repository root
-  PYTHON_VERSION: '3.11.3' # set this to the python version to use (supports 3.6, 3.7, 3.8)
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
+  PYTHON_VERSION: '3.10' # set this to the python version to use (supports 3.6, 3.7, 3.8)
 
 jobs:
   build:
@@ -51,11 +32,8 @@ jobs:
           source venv/bin/activate
 
       - name: Install dependencies
-        run: pip install -r scenarios/natural_language_query/azurefunc/requirements.txt
-        #working-directory: ./dependencies
-        #pip install -r requirements.txt --target=".python_packages/lib/site-packages"
-          #popd
-                
+        run: pip install -r requirements.txt
+        
       # Optional: Add step to run tests here
 
       - name: Upload artifact for deployment job
@@ -63,31 +41,30 @@ jobs:
         with:
           name: python-app
           path: |
-            ${{ github.workspace }}/${{ github.event.inputs.GIT_FunctionApp_PATH }} 
-            !venv/ 
+            . 
+            !venv/
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
       name: 'Production'
-      #url: ${{ steps.deploy-to-function.outputs.webapp-url }}
-      url: ${{ github.event.inputs.GIT_FunctionApp_URL }}
+      url: ${{ steps.deploy-to-function.outputs.webapp-url }}
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
           name: python-app
-          path: ${{ github.workspace }}/${{ github.event.inputs.GIT_FunctionApp_PATH }} #'${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          path: .
 
       - name: 'Deploy to Azure Functions'
         uses: Azure/functions-action@v1
         id: deploy-to-function
         with:
-          app-name: ${{ github.event.inputs.GIT_FunctionApp_Name }} #'samplefuncapp1122'
+          app-name: 'samplefuncapp1122'
           slot-name: 'Production'
-          package: ${{ github.workspace }}/${{ github.event.inputs.GIT_FunctionApp_PATH }} #'${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4EB07EF61A2F474E878430863A7A72E1 }}
           scm-do-build-during-deployment: true
           enable-oryx-build: true
